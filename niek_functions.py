@@ -17,7 +17,7 @@ class ENA(object):
     def __init__(self): 
            print(ENA.rm.list_resources())
            a = ENA.rm.list_resources()
-           if ('USB0::0x0957::0x1309::MY49406990::INSTR' in a):
+           if ('USB0::0x0957::0x1309::MY49406990::INSTR' in a): #check if the ENA is connected
                print('ENA E5061B Detected')
            else:
                print('ENA E5061B not Detected')
@@ -136,7 +136,41 @@ class ENA(object):
                 f.write(b'\t\t')
                 np.savetxt(f, slice_2d, delimiter="\t ", fmt='%e',newline='\r\n')
 
+#place holders for future equipment to be added
+class ESS(object): 
+    rm = visa.ResourceManager()
+
+    def __init__(self): 
+           print(ENA.rm.list_resources())
+           a = ENA.rm.list_resources()
+           if ('' in a): #check if the ENA is connected
+               print('ENA E5061B Detected')
+           else:
+               print('ENA E5061B not Detected')
+               raise ValueError
+
+class LCR(object):
+    rm = visa.ResourceManager()
+    
+class WGEN(object):
+    rm = visa.ResourceManager()
+    
+class MM(object):
+    rm = visa.ResourceManager()
+##################################################
+
          
+
+
+
+
+
+
+
+
+
+
+# additional classes    
 class switch(object):
     def __init__(self, value):
         self.value = value
