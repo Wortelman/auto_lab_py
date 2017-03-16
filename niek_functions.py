@@ -16,6 +16,13 @@ class ENA(object):
 
     def __init__(self): 
            print(ENA.rm.list_resources())
+           a = ENA.rm.list_resources()
+           if ('USB0::0x0957::0x1309::MY49406990::INSTR' in a): #check if the ENA is connected
+               print('ENA E5061B Detected')
+           else:
+               print('ENA E5061B not Detected')
+               raise ValueError
+           
     
     def connect():
         self = ENA.rm.open_resource('USB0::0x0957::0x1309::MY49406990::0::INSTR')
@@ -70,8 +77,12 @@ class ENA(object):
                  
              return self
              
-    def measure(self):
+    def measure_Spar(self):
         self  = ENA.connect()
+        self.write(":DISP:WIND1:TRAC1:Y:AUTO") #auto scales Y-axis trace1
+        self.write(":DISP:WIND1:TRAC2:Y:AUTO") #auto scales Y-axis trace2
+        self.write(":DISP:WIND1:TRAC3:Y:AUTO") #auto scales Y-axis trace3
+        self.write(":DISP:WIND1:TRAC4:Y:AUTO") #auto scales Y-axis trace4
         freq = np.fromstring(self.query("SENS1:FREQ:DATA?"),dtype=float,sep=',')    
         self.write(":CALC1:PAR1:SEL")
         tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"),dtype=float,sep=',')
@@ -90,6 +101,18 @@ class ENA(object):
         B = np.transpose(np.dstack([S21,S22]), axes=[0,2,1])
         C = np.resize(np.hstack([A,B]),(1601,1,8))
         return C, freq
+    
+    def measure_Zpar(self):
+        print('to be created')
+    
+    def measure_Zser(self):
+        print('to be created')
+        
+    def write_csv(self,Z,freq,m_str):
+#        now = time.strftime("%c")
+#        name = m_str + "csv"
+        print('to be created')
+    
         
     def write_touchtone(self,C,freq,m_str):
         now = time.strftime("%c")
@@ -113,7 +136,41 @@ class ENA(object):
                 f.write(b'\t\t')
                 np.savetxt(f, slice_2d, delimiter="\t ", fmt='%e',newline='\r\n')
 
+#place holders for future equipment to be added
+class ESS(object): 
+    rm = visa.ResourceManager()
+
+    def __init__(self): 
+           print(ENA.rm.list_resources())
+           a = ENA.rm.list_resources()
+           if ('' in a): #check if the ENA is connected
+               print('ENA E5061B Detected')
+           else:
+               print('ENA E5061B not Detected')
+               raise ValueError
+
+class LCR(object):
+    rm = visa.ResourceManager()
+    
+class WGEN(object):
+    rm = visa.ResourceManager()
+    
+class MM(object):
+    rm = visa.ResourceManager()
+##################################################
+
          
+
+
+
+
+
+
+
+
+
+
+# additional classes    
 class switch(object):
     def __init__(self, value):
         self.value = value
@@ -134,13 +191,6 @@ class switch(object):
         else:
             return False
 
-#    
-#    def ENA(): #program does nothing as written
-#    print("Happy Birthday to you!")
-#    print("Happy Birthday to you!")
-#    print("Happy Birthday, dear Emily.")
-#    print("Happy Birthday to you!")
-#    
     
 
     
