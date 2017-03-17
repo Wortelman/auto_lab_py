@@ -22,7 +22,7 @@ plt.show()
 # axarr[0].loglog(f, Matrix[:,:,1])
 # axarr[0].set_title('Sharing X axis')
 # axarr[1].loglog(f, Matrix[:,:,2])
-# plt.show()
+ plt.show()
 
 
 [Matrix2,f2] = obj1.measure_Zser("1") # input is the port number in a string
