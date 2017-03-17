@@ -152,9 +152,22 @@ class ENA(object):
 
 
     def write_csv(self,Z,freq,m_str):
-#        now = time.strftime("%c")
-#        name = m_str + "csv"
-        print('to be created')
+        now = time.strftime("%c")
+        name = m_str + ".csv"
+        with open(name, 'w') as f:
+            f.write('! CSV Niek Moonen Python script \n')
+            f.write('! Current date & time %s \n' % now)
+            f.write('! Project name: \n')
+            f.write('! Header version: jan 2017 \n')
+            f.write('# HZ S MA R 50 \n')
+        with open(name,'ab') as f:
+            i=-1
+            for slice_2d in Z:
+                i=i+1
+                somestring = repr(freq[i])
+                f.write(somestring.encode('ascii'))
+                f.write(b'\t\t')
+                np.savetxt(f, slice_2d, delimiter=";\t ", fmt='%e',newline='\r\n')
     
         
     def write_touchtone(self,C,freq,m_str):
