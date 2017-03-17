@@ -104,10 +104,29 @@ class ENA(object):
     
     def measure_Zpar(self):
         print('to be created')
-    
+        self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
+        self.write("CALCulate:PARameter:DEF Z")  # set to S11
+        self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
+        self.write("CALCulate:PARameter2:DEF Z")  # set to S12
+        self.write(":DISPlay:WIND1:TRAC3:STAT ON")  # activate trace 3
+        self.write("CALCulate:PARameter3:DEF Z")  # set to S21
+        self.write(":DISPlay:WIND1:TRAC4:STAT ON")  # activate trace 4
+        self.write("CALCulate:PARameter4:DEF Z")  # set to S22
+        self.write(":CALC1:PAR1:SEL")
+        ENA.imp("S11","P1R","Z")
+
     def measure_Zser(self):
         print('to be created')
-        
+
+    def imp(self,port,refl,zpara):
+        self = ENA.connect()
+        self.write("CALC:PAR:DEF " + port) #(S11,S22,S21 or S12)
+        self.write("SENS:Z:METH " + refl) #(P1Reflection or "P2Reflection", "TSERies", "TSHunt")
+        self.write("CACL1:PAR:DEF Z") #
+        self.write("CACL1:SEL:ZPAR:DEF " + zpara)
+        #self.write("CALC1:SEL:FORM REAL") #NOT sure if auto selection is ok?
+
+
     def write_csv(self,Z,freq,m_str):
 #        now = time.strftime("%c")
 #        name = m_str + "csv"
