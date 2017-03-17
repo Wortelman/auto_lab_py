@@ -86,7 +86,6 @@ class ENA(object):
         freq = np.fromstring(self.query("SENS1:FREQ:DATA?"),dtype=float,sep=',')    
         self.write(":CALC1:PAR1:SEL")
         tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"),dtype=float,sep=',')
-        S11 = np.resize(np.resize(tmp,(1601,2)).T,(1,2,1601))
         S11 = np.resize(tmp,(1601,2))
         self.write(":CALC1:PAR2:SEL")
         tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"),dtype=float,sep=',')
@@ -102,29 +101,54 @@ class ENA(object):
         C = np.resize(np.hstack([A,B]),(1601,1,8))
         return C, freq
     
-    def measure_Zpar(self):
-        print('to be created')
-        self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
-        self.write("CALCulate:PARameter:DEF Z")  # set to S11
-        self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
-        self.write("CALCulate:PARameter2:DEF Z")  # set to S12
-        self.write(":DISPlay:WIND1:TRAC3:STAT ON")  # activate trace 3
-        self.write("CALCulate:PARameter3:DEF Z")  # set to S21
-        self.write(":DISPlay:WIND1:TRAC4:STAT ON")  # activate trace 4
-        self.write("CALCulate:PARameter4:DEF Z")  # set to S22
-        self.write(":CALC1:PAR1:SEL")
-        ENA.imp("S11","P1R","Z")
-
-    def measure_Zser(self):
-        print('to be created')
-
-    def imp(self,port,refl,zpara):
+    def measure_Zpar(self,port):
         self = ENA.connect()
-        self.write("CALC:PAR:DEF " + port) #(S11,S22,S21 or S12)
-        self.write("SENS:Z:METH " + refl) #(P1Reflection or "P2Reflection", "TSERies", "TSHunt")
-        self.write("CACL1:PAR:DEF Z") #
-        self.write("CACL1:SEL:ZPAR:DEF " + zpara)
-        #self.write("CALC1:SEL:FORM REAL") #NOT sure if auto selection is ok?
+        ENA.imp(self, "1", "S11", "P"+port+"R", "Z",'MLOG')
+        ENA.imp(self, "2", "S11", "P"+port+"R", "CP",'MLIN')
+        ENA.imp(self, "3", "S11", "P"+port+"R", "LP",'MLIN')
+        ENA.imp(self, "4", "S11", "P"+port+"R", "Z",'PHASE')
+        time.sleep(2)
+        [data,f]=ENA.get_data(self)
+        return data,f
+
+    def measure_Zser(self,port):
+        self = ENA.connect()
+        ENA.imp(self, "1", "S11", "P"+port+"R", "Z",'MLOG')
+        ENA.imp(self, "2", "S11", "P"+port+"R", "Cs",'MLIN')
+        ENA.imp(self, "3", "S11", "P"+port+"R", "Ls",'MLIN')
+        ENA.imp(self, "4", "S11", "P"+port+"R", "Z",'PHASE')
+        time.sleep(2)
+        [data,f]=ENA.get_data(self)
+        return data,f
+
+    def imp(self,trace,port,refl,zpara,form):
+        self = ENA.connect()
+        self.write(":CALC1:PAR"+trace+":SEL")
+        self.write(":CALC1:PAR" + trace + ":DEF " + port ) #(S11,S22,S21 or S12)
+        self.write(":SENS:Z:METH " + refl ) #(P1Reflection or "P2Reflection", "TSERies", "TSHunt")
+        self.write(":CALC1:PAR"+trace+":DEF Z") #
+        self.write(":CALC1:SEL:ZPAR:DEF " + zpara )
+        self.write(":CALC1:SEL:FORM " + form) #NOT sure if auto selection is ok?
+        self.write(":DISP:WIND1:TRAC"+trace+":Y:AUTO")  # auto scales Y-axis trace1
+
+    def get_data(self):
+        freq = np.fromstring(self.query("SENS1:FREQ:DATA?"), dtype=float, sep=',')
+        self.write(":CALC1:PAR1:SEL")
+        tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"), dtype=float, sep=',')
+        S11 = np.resize(tmp, (1601, 2))
+        self.write(":CALC1:PAR2:SEL")
+        tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"), dtype=float, sep=',')
+        S12 = np.resize(tmp, (1601, 2))
+        self.write(":CALC1:PAR3:SEL")
+        tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"), dtype=float, sep=',')
+        S21 = np.resize(tmp, (1601, 2))
+        self.write(":CALC1:PAR4:SEL")
+        tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"), dtype=float, sep=',')
+        S22 = np.resize(tmp, (1601, 2))
+        A = np.transpose(np.dstack([S11, S12]), axes=[0, 2, 1])
+        B = np.transpose(np.dstack([S21, S22]), axes=[0, 2, 1])
+        C = np.resize(np.hstack([A, B]), (1601, 1, 8))
+        return C, freq
 
 
     def write_csv(self,Z,freq,m_str):
