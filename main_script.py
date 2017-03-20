@@ -12,8 +12,12 @@ obj1 = n.ENA(); # creation of ENA object
 #obj1.setup('Mutual') # setup the standard <-- watch out with this, callibration is deleted!!
 #n.time.sleep(1) # to fast execution of setup and measure gives error
 
-# [A,f]=obj1.measure_Spar()
-[Matrix,f] = obj1.measure_Zpar("2") # input is the port number in a string
+[A,f]=obj1.measure_Spar()
+plt.semilogx(f,abs(A[:,:,1]))
+plt.show()
+
+
+# [Matrix,f] = obj1.measure_Zpar("2") # input is the port number in a string
 # plt.semilogx(f,Matrix[:,:,1])
 # plt.show()
 
@@ -29,5 +33,6 @@ obj1 = n.ENA(); # creation of ENA object
 # plt.semilogx(f2,Matrix2[:,:,1])
 # plt.show()
 #obj1.write_touchtone(A,f,"measurements/3phase_center")
-obj1.write_csv(Matrix,f,"geenideeofhetwerkt2")
+
+# obj1.write_csv(Matrix,f,"geenideeofhetwerkt2")
 # plt.interactive(False)

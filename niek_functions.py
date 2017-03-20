@@ -29,7 +29,7 @@ class ENA(object):
         return self
 
     def setup(self, v):
-        self = ENA.connect()
+        self = ENA.connect(self)
         for case in switch(v):
 
             if case('Mutual'):
@@ -75,7 +75,23 @@ class ENA(object):
             return self
 
     def measure_Spar(self):
-        self = ENA.connect()
+        self = ENA.connect(self)
+        self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
+        self.write("CALCulate:PARameter:DEF S11")  # set to S11
+        self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
+        self.write("CALCulate:PARameter2:DEF S12")  # set to S12
+        self.write(":DISPlay:WIND1:TRAC3:STAT ON")  # activate trace 3
+        self.write("CALCulate:PARameter3:DEF S21")  # set to S21
+        self.write(":DISPlay:WIND1:TRAC4:STAT ON")  # activate trace 4
+        self.write("CALCulate:PARameter4:DEF S22")  # set to S22
+        self.write(":CALC1:PAR1:SEL")
+        self.write(":CALC1:FORM SLIN")  # smith chart! linear mag and phase
+        self.write(":CALC1:PAR2:SEL")
+        self.write(":CALC1:FORM SLIN")  # smith chart! linear mag and phase
+        self.write(":CALC1:PAR3:SEL")
+        self.write(":CALC1:FORM SLIN")  # smith chart! linear mag and phase
+        self.write(":CALC1:PAR4:SEL")
+        self.write(":CALC1:FORM SLIN")  # smith chart! linear mag and phase
         self.write(":DISP:WIND1:TRAC1:Y:AUTO")  # auto scales Y-axis trace1
         self.write(":DISP:WIND1:TRAC2:Y:AUTO")  # auto scales Y-axis trace2
         self.write(":DISP:WIND1:TRAC3:Y:AUTO")  # auto scales Y-axis trace3
@@ -99,7 +115,7 @@ class ENA(object):
         return C, freq
 
     def measure_Zpar(self, port):
-        self = ENA.connect()
+        self = ENA.connect(self)
         ENA.imp(self, "1", "S11", "P" + port + "R", "Z", 'MLOG')
         ENA.imp(self, "2", "S11", "P" + port + "R", "CP", 'MLIN')
         ENA.imp(self, "3", "S11", "P" + port + "R", "LP", 'MLIN')
@@ -109,7 +125,7 @@ class ENA(object):
         return data, f
 
     def measure_Zser(self, port):
-        self = ENA.connect()
+        self = ENA.connect(self)
         ENA.imp(self, "1", "S11", "P" + port + "R", "Z", 'MLOG')
         ENA.imp(self, "2", "S11", "P" + port + "R", "Cs", 'MLIN')
         ENA.imp(self, "3", "S11", "P" + port + "R", "Ls", 'MLIN')
@@ -119,7 +135,7 @@ class ENA(object):
         return data, f
 
     def imp(self, trace, port, refl, zpara, form):
-        self = ENA.connect()
+        self = ENA.connect(self)
         self.write(":CALC1:PAR" + trace + ":SEL")
         self.write(":CALC1:PAR" + trace + ":DEF " + port)  # (S11,S22,S21 or S12)
         self.write(":SENS:Z:METH " + refl)  # (P1Reflection or "P2Reflection", "TSERies", "TSHunt")
