@@ -76,6 +76,7 @@ class ENA(object):
 
     def measure_Spar(self):
         self = ENA.connect(self)
+
         self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
         self.write("CALCulate:PARameter:DEF S11")  # set to S11
         self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
