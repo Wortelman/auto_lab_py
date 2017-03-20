@@ -6,19 +6,22 @@ Created on Wed Mar 15 10:59:11 2017
 """
 import niek_functions as n
 import matplotlib.pyplot as plt
-obj1 = n.ENA(); # creation of ENA object
 
-#### Only use this part for first setup, since it does a total reset!
-#obj1.setup('Mutual') # setup the standard <-- watch out with this, callibration is deleted!!
-#n.time.sleep(1) # to fast execution of setup and measure gives error
+obj1 = n.ENA(); # creation of ENA object
+obj1.setup_display('First')
+n.time.sleep(1)
+obj1.setup_display('Mutual')
+n.time.sleep(1)
 
 [A,f]=obj1.measure_Spar()
-plt.semilogx(f,abs(n.meas2comp(A[:,:,1])))
+plt.loglog(f,abs(n.meas2comp(A[:,:,2],A[:,:,3])))
 plt.show()
 
-M = n.Mutual_coupling(f,S,50)
+M = n.Mutual_coupling(f,A,50)
+plt.semilogx(f,M)
+plt.show()
 
-
+n.time.sleep(1)
 # [Matrix,f] = obj1.measure_Zpar("2") # input is the port number in a string
 # plt.semilogx(f,Matrix[:,:,1])
 # plt.show()
