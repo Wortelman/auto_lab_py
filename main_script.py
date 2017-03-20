@@ -13,8 +13,10 @@ obj1 = n.ENA(); # creation of ENA object
 #n.time.sleep(1) # to fast execution of setup and measure gives error
 
 [A,f]=obj1.measure_Spar()
-plt.semilogx(f,abs(A[:,:,1]))
+plt.semilogx(f,abs(n.meas2comp(A[:,:,1])))
 plt.show()
+
+M = n.Mutual_coupling(f,S,50)
 
 
 # [Matrix,f] = obj1.measure_Zpar("2") # input is the port number in a string
