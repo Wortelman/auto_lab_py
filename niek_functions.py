@@ -46,15 +46,15 @@ class ENA(object):
                 self.write(":DISPlay:SPLit D1")  # activate 1 channel
                 self.write(":DISPlay:WIND1:SPLit D1_2_3_4")  # split window into 4 displays
                 self.write(":DISPlay:WIND1:ACT")  # activate chanel 1
-                self.write("CALC:PAR:COUN 4")  # set amount of traces
-                # self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
-                # self.write("CALCulate:PARameter:DEF S11")  # set to S11
-                # self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
-                # self.write("CALCulate:PARameter2:DEF S12")  # set to S12
-                # self.write(":DISPlay:WIND1:TRAC3:STAT ON")  # activate trace 3
-                # self.write("CALCulate:PARameter3:DEF S21")  # set to S21
-                # self.write(":DISPlay:WIND1:TRAC4:STAT ON")  # activate trace 4
-                # self.write("CALCulate:PARameter4:DEF S22")  # set to S22
+                self.write(":CALC:PAR:COUN 4")  # set amount of traces
+                self.write(":DISPlay:WIND1:TRAC1:STAT ON")  # activate trace 1
+                self.write(":CALCulate1:PARameter:DEF S11")  # set to S11
+                self.write(":DISPlay:WIND1:TRAC2:STAT ON")  # activate trace 2
+                self.write(":CALCulate2:PARameter2:DEF S12")  # set to S12
+                self.write(":DISPlay:WIND1:TRAC3:STAT ON")  # activate trace 3
+                self.write(":CALCulate3:PARameter3:DEF S21")  # set to S21
+                self.write(":DISPlay:WIND1:TRAC4:STAT ON")  # activate trace 4
+                self.write(":CALCulate4:PARameter4:DEF S22")  # set to S22
                 self.write(":SENS1:FREQ:STAR 1E3")  # set start freq
                 self.write(":SENS1:FREQ:STOP 100E6")  # sets stop freq
                 self.write(":SENS1:SWE:POIN 1601")  # sets amount of freq points
@@ -68,23 +68,29 @@ class ENA(object):
                 self.write(":DISPlay:SPLit D1")  # activate 1 channel
                 self.write(":DISPlay:WIND1:SPLit D1_2_3_4")  # split window into 4 displays
                 self.write(":DISPlay:WIND1:ACT")  # activate chanel 1
-                self.write("CALC:PAR:COUN 4")  # set amount of traces
+                self.write(":CALC:PAR:COUN 4")  # set amount of traces
             return self
 
     def measure_Spar(self):
         self = ENA.connect(self)
         ENA.S(self, "1", "S11", "SLIN")
+        time.sleep(1)
         ENA.S(self, "2", "S12", "SLIN")
+        time.sleep(1)
         ENA.S(self, "3", "S21", "SLIN")
+        time.sleep(1)
         ENA.S(self, "4", "S22", "SLIN")
         [C, freq] = ENA.get_data(self)
         return C, freq
 
     def S(self, trace, port, form):
-        self.write(":CALC" + trace + ":PAR:SEL")
-        self.write(":DISPlay:WIND1:TRAC" + trace + ":STAT ON")  # activate trace 1
-        self.write("CALC" + trace + ":PARameter:DEF " + port + "")  # set to S11,S12,S21,S22
-        self.write(":CALC" + trace + ":FORM " + form + "")  # smith chart! linear mag and phase
+        # self.write(":CALC" + trace + ":PAR:SEL")
+        # self.write(":DISPlay:WIND1:TRAC" + trace + ":STAT ON")  # activate trace 1
+
+        self.write(":CALC1:PAR" + trace + ":SEL")
+        self.write(":CALC1:PAR" + trace + ":DEF " + port)  # (S11,S22,S21 or S12)
+        # self.write(":CALC" + trace + ":PARameter:DEF " + port + "")  # set to S11,S12,S21,S22
+        self.write(":CALC1:FORM " + form + "")  # smith chart! linear mag and phase
         self.write(":DISP:WIND1:TRAC" + trace + ":Y:AUTO")  # auto scales Y-axis trace1
 
     def measure_Zpar(self, port):
@@ -119,6 +125,7 @@ class ENA(object):
 
     # litle bit dirty get function and formating
     def get_data(self):
+        self = ENA.connect(self)
         freq = np.fromstring(self.query("SENS1:FREQ:DATA?"), dtype=float, sep=',')
         self.write(":CALC1:PAR1:SEL")
         tmp = np.fromstring(self.query(":CALC1:DATA:FDAT?"), dtype=float,
@@ -147,14 +154,26 @@ class ENA(object):
             f.write('! Project name: \n')
             f.write('! Header version: jan 2017 \n')
             f.write('# HZ S MA R 50 \n')
-        with open(name, 'ab') as f:
-            i = -1
-            for slice_2d in Z:
-                i = i + 1
-                somestring = repr(freq[i])
-                f.write(somestring.encode('ascii'))
-                f.write(b'\t\t')
-                np.savetxt(f, slice_2d, delimiter=";\t ", fmt='%e', newline='\r\n')
+        if len(Z.shape)==1:
+            with open(name, 'ab') as f:
+                print('hij komt in de  writer voor 1D')
+                i = -1
+                for x in Z:
+                    i = i + 1
+                    somestring = repr(freq[i])
+                    f.write(somestring.encode('ascii'))
+                    f.write(b'\t\t ;')
+                    np.savetxt(f, np.array(x).reshape(1,), delimiter=";\t ", fmt='%e', newline='\r\n')
+        elif len(Z.shape)>1:
+            with open(name, 'ab') as f:
+                i = -1
+                for slice_2d in Z:
+                    i = i + 1
+                    somestring = repr(freq[i])
+                    f.write(somestring.encode('ascii'))
+                    f.write(b'\t\t')
+                    np.savetxt(f, slice_2d, delimiter=";\t ", fmt='%e', newline='\r\n')
+
 
     def write_touchtone(self, C, freq, m_str):
         now = time.strftime("%c")
@@ -243,6 +262,10 @@ class switch(object):
 
 def Mutual_coupling(freq, S, Z0):
     S11 = meas2comp(np.array(S[:, 0, 0]), np.array(S[:, 0, 1]))
+    print('should be mag from here')
+    print(S[:, 0, 0])
+    print('should be degree from here')
+    print(S[:, 0, 1])
     S12 = meas2comp(np.array(S[:, 0, 2]), np.array(S[:, 0, 3]))
     S21 = meas2comp(np.array(S[:, 0, 4]), np.array(S[:, 0, 5]))
     S22 = meas2comp(np.array(S[:, 0, 5]), np.array(S[:, 0, 7]))
