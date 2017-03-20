@@ -149,6 +149,7 @@ class ENA(object):
         now = time.strftime("%c")
         name = m_str + ".csv"
         with open(name, 'w') as f:
+            f.write('sep=; \n')
             f.write('! CSV Niek Moonen Python script \n')
             f.write('! Current date & time %s \n' % now)
             f.write('! Project name: \n')
@@ -171,7 +172,7 @@ class ENA(object):
                     i = i + 1
                     somestring = repr(freq[i])
                     f.write(somestring.encode('ascii'))
-                    f.write(b'\t\t')
+                    f.write(b'\t\t ;')
                     np.savetxt(f, slice_2d, delimiter=";\t ", fmt='%e', newline='\r\n')
 
 
