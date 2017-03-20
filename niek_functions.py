@@ -175,7 +175,6 @@ class ENA(object):
                     f.write(b'\t\t ;')
                     np.savetxt(f, slice_2d, delimiter=";\t ", fmt='%e', newline='\r\n')
 
-
     def write_touchtone(self, C, freq, m_str):
         now = time.strftime("%c")
         name = m_str + ".s2p"
