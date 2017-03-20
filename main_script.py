@@ -30,15 +30,21 @@ n.time.sleep(2)
 [Matrix,f] = obj1.measure_Zpar("2") # input is the port number in a string
 plt.loglog(f,Matrix[:, :, 0])
 plt.show()
-obj1.write_csv(Matrix,f,naam+'_imp')
+obj1.write_csv(Matrix,f,naam+'_port2_imp')
 
-# Two subplots, the axes array is 1-d
-fx, axarr = plt.subplots(3, sharex=True)
-axarr[0].loglog(f,abs(n.meas2comp(A[:,:,4],A[:,:,5])))
-axarr[0].set_title('Sharing X axis')
-axarr[1].loglog(f, M)
-axarr[2].loglog(f,Matrix[:, :, 1])
+n.time.sleep(2)
+[Matrix,f] = obj1.measure_Zser("1") # input is the port number in a string
+plt.loglog(f,Matrix[:, :, 0])
 plt.show()
+obj1.write_csv(Matrix,f,naam+'_port1_imp')
+
+# # Two subplots, the axes array is 1-d
+# fx, axarr = plt.subplots(3, sharex=True)
+# axarr[0].loglog(f,abs(n.meas2comp(A[:,:,4],A[:,:,5])))
+# axarr[0].set_title('Sharing X axis')
+# axarr[1].loglog(f, M)
+# axarr[2].loglog(f,Matrix[:, :, 1])
+# plt.show()
 
 #
 # [Matrix2,f2] = obj1.measure_Zser("1") # input is the port number in a string
