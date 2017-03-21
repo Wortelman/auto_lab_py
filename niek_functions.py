@@ -58,6 +58,7 @@ class ENA(object):
                 self.write(":SENS1:FREQ:STAR 1E3")  # set start freq
                 self.write(":SENS1:FREQ:STOP 100E6")  # sets stop freq
                 self.write(":SENS1:SWE:POIN 1601")  # sets amount of freq points
+                self.write(":SENS1:SWE:TYPE LOG")  # sets log sweep of freq points
                 self.write(":DISP:WIND1:TRAC1:Y:AUTO")  # auto scales Y-axis trace1
                 self.write(":DISP:WIND1:TRAC2:Y:AUTO")  # auto scales Y-axis trace2
                 self.write(":DISP:WIND1:TRAC3:Y:AUTO")  # auto scales Y-axis trace3
